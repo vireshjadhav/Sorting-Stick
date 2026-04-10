@@ -163,6 +163,9 @@ namespace Gameplay
 				time_complexity = "O(n^2";
 				sort_thread = std::thread(&StickCollectionController::processInsertionSort, this);
 				break;
+			case Gameplay::Collection::SortType::SELECTION_SORT:
+				time_complexity = "O(n^2)";
+				sort_thread = std::thread(&StickCollectionController::processSelectionSort, this);
 			}
 		}
 
@@ -189,6 +192,7 @@ namespace Gameplay
 
 					if (sticks[j - 1]->data > sticks[j]->data)
 					{
+						number_of_array_access += 3;
 						std::swap(sticks[j - 1], sticks[j]);
 						swapped = true;
 					}
@@ -261,6 +265,59 @@ namespace Gameplay
 				std::this_thread::sleep_for(std::chrono::milliseconds(current_operation_delay));
 				sticks[j + 1]->stick_view->setFillColor(collection_model->selected_element_color);
 			}
+			setCompletedColor();
+		}
+
+		void StickCollectionController::processSelectionSort()
+		{
+			Sound::SoundService* sound_service = ServiceLocator::getInstance()->getSoundService();
+
+			for (int i = 0; i < sticks.size() - 1; ++i)
+			{
+				if (sort_state == SortState::NOT_SORTING) break;
+
+				int min_index = i;
+
+				sticks[i]->stick_view->setFillColor(collection_model->selected_element_color);
+
+				for (int j = i + 1; j < sticks.size(); ++j)
+				{
+					if (sort_state == SortState::NOT_SORTING) break;
+
+					number_of_array_access += 2;
+					number_of_comparisons++;
+
+					sound_service->playSound(Sound::SoundType::COMPARE_SFX);
+
+					sticks[j]->stick_view->setFillColor(collection_model->processing_element_color);
+
+					std::this_thread::sleep_for(std::chrono::milliseconds(current_operation_delay));
+
+					if (sticks[j]->data < sticks[min_index]->data)
+					{
+						if (min_index != i)
+						{
+							sticks[min_index]->stick_view->setFillColor(collection_model->element_color);
+						}
+
+						min_index = j;
+						sticks[min_index]->stick_view->setFillColor(collection_model->temporary_processing_color);
+					}
+					else
+					{
+						sticks[j]->stick_view->setFillColor(collection_model->element_color);
+					}
+				}
+
+				number_of_array_access += 3;
+				std::swap(sticks[min_index], sticks[i]);
+
+				sticks[min_index]->stick_view->setFillColor(collection_model->element_color);
+				sticks[i]->stick_view->setFillColor(collection_model->placement_position_element_color);
+
+				updateStickPosition();
+			}
+			sticks[sticks.size() - 1]->stick_view->setFillColor(collection_model->placement_position_element_color);
 			setCompletedColor();
 		}
 
