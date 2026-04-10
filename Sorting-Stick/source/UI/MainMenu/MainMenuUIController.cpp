@@ -75,7 +75,7 @@ namespace UI
         {
             bubble_sort_button->registerCallbackFuntion(std::bind(&MainMenuUIController::bubbleSortButtonCallback, this));
             insertion_sort_button->registerCallbackFuntion(std::bind(&MainMenuUIController::insertionSortButtonCallback, this));
-            //selection_sort_button->registerCallbackFuntion(std::bind(&MainMenuUIController::selectionSortButtonCallback, this));
+            selection_sort_button->registerCallbackFuntion(std::bind(&MainMenuUIController::selectionSortButtonCallback, this));
             //merge_sort_button->registerCallbackFuntion(std::bind(&MainMenuUIController::mergeSortButtonCallback, this));
             //quick_sort_button->registerCallbackFuntion(std::bind(&MainMenuUIController::quickSortButtonCallback, this));
             //radix_sort_button->registerCallbackFuntion(std::bind(&MainMenuUIController::radixSortButtonCallback, this));
@@ -92,12 +92,12 @@ namespace UI
         {
             changeGameStateToGameplay();            
             ServiceLocator::getInstance()->getGameplayService()->sortElement(Gameplay::Collection::SortType::INSERTION_SORT);
-
         }
 
         void MainMenuUIController::selectionSortButtonCallback()
         {
             changeGameStateToGameplay();
+            ServiceLocator::getInstance()->getGameplayService()->sortElement(Gameplay::Collection::SortType::SELECTION_SORT);
         }
 
         void MainMenuUIController::mergeSortButtonCallback()
